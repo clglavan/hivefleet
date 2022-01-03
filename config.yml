@@ -1,0 +1,10 @@
+clients: 5
+local: 0
+deploy_function: 1
+function_memory: 256
+function_timeout: 120
+function_region: "us-central1"
+credentials: "/Users/cristianglavan/Work/eroot/hive-mind/credentials.json"
+concurrency: 1
+number: 10
+url: https://example.com
