@@ -28,9 +28,12 @@ setup your config file
 
 Before you proceed, please check Google's pricing for Cloud Functions: https://cloud.google.com/functions/pricing#cloud-functions-pricing
 
-Run the hive-mind
+Run the hive-mind with one of the two binaries
 
-    ./hive-mind
+    ./hive-mind-darwin-amd64
+    - or -
+    ./hive-mind-linux-amd64
+
 
 In the folder you will see a generated `report.html`
 
