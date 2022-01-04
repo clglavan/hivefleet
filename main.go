@@ -15,6 +15,7 @@ import (
 	"path/filepath"
 	"strings"
 	"sync"
+	"time"
 
 	"gopkg.in/yaml.v2"
 )
@@ -74,6 +75,7 @@ type conf struct {
 	Number           string
 	Url              string
 	Local            int
+	Debug            int
 }
 
 func (c *conf) getConf() *conf {
@@ -113,34 +115,31 @@ func main() {
 			fmt.Println("Error: ", err)
 		}
 
-		// create the results bucket if it doesn't exist
-		fmt.Println("Creating the results bucket")
-		bucket := exec.Command("gsutil", "mb", "gs://hive-fleet-results")
-		bucket.Stdout = os.Stdout
-		bucket.Stderr = os.Stderr
-		if err := bucket.Run(); err != nil {
-			fmt.Println("Error: ", err)
-		}
+		// TODO - upload results to bucket
+		// // create the results bucket if it doesn't exist
+		// fmt.Println("Creating the results bucket")
+		// bucket := exec.Command("gsutil", "mb", "gs://hive-fleet-results")
+		// bucket.Stdout = os.Stdout
+		// bucket.Stderr = os.Stderr
+		// if err := bucket.Run(); err != nil {
+		// 	fmt.Println("Error: ", err)
+		// }
 
-		fmt.Println("Cleanup results bucket")
-		cleanup := exec.Command("gsutil", "rm", "gs://hive-fleet-results/results/*")
-		// cleanup.Stdout = os.Stdout
-		// cleanup.Stderr = os.Stderr
-		if err := cleanup.Run(); err != nil {
-			fmt.Println("Error: ", err)
-		}
+		// fmt.Println("Cleanup results bucket")
+		// cleanup := exec.Command("gsutil", "rm", "gs://hive-fleet-results/results/*")
+		// // cleanup.Stdout = os.Stdout
+		// // cleanup.Stderr = os.Stderr
+		// if err := cleanup.Run(); err != nil {
+		// 	fmt.Println("Error: ", err)
+		// }
 	}
-	// gsutil mb gs://BUCKET_NAME
-	// gsutil du -s gs://BUCKET_NAME
-
-	// gsutil cp OBJECT_LOCATION gs://DESTINATION_BUCKET_NAME/
 
 	// Getting the current working directory
 	currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
 	if err != nil {
 		log.Fatal(err)
 	}
-	fmt.Println(c.Deploy_function)
+
 	if c.Deploy_function == 1 && c.Local == 0 {
 		fmt.Println("Deploying the function is set to true")
 		// Deploy
@@ -154,7 +153,7 @@ func main() {
 			fmt.Println("Error: ", err)
 		}
 		// sleep a bit, wait for the function to update
-		// time.Sleep(20 * time.Second)
+		time.Sleep(10 * time.Second)
 	}
 
 	// Get the authorization token
@@ -166,8 +165,10 @@ func main() {
 		fmt.Println("Error: ", err)
 	}
 	tokenString := strings.TrimSpace(buf.String())
-	fmt.Printf("The Token: %s\n", tokenString)
 
+	if c.Debug == 1 {
+		fmt.Printf("The Token: %s\n", tokenString)
+	}
 	// Get the project id
 	projectId := exec.Command("gcloud", "config", "get-value", "project")
 	bufProjectId := bytes.Buffer{}
@@ -204,7 +205,7 @@ func main() {
 	reports := make([]Report, c.Clients)
 
 	for i := 0; i < c.Clients; i++ {
-		fmt.Println("iteration: ", i)
+		// fmt.Println("iteration: ", i)
 
 		wg.Add(1)
 		go func(i int) {
@@ -219,12 +220,8 @@ func main() {
 					log.Fatal(err)
 				}
 				bodyString := string(bodyBytes)
-				fmt.Println(bodyString)
-				// res := Report{}
-				// json.Unmarshal([]byte(bodyString), &reports[i])
-				// json.Unmarshal([]byte(bodyString), &res)
+				// fmt.Println(bodyString)
 				json.Unmarshal([]byte(bodyString), &reports[i])
-				// fmt.Println()
 
 				finalReport.BytesRead = (finalReport.BytesRead + reports[i].Result.BytesRead) / 2
 				finalReport.BytesWritten = (finalReport.BytesWritten + reports[i].Result.BytesWritten) / 2
@@ -253,11 +250,13 @@ func main() {
 
 	// fmt.Println(reports)
 	wg.Wait()
-	for i := 0; i < c.Clients; i++ {
-		fmt.Println(reports[i])
+	if c.Debug == 1 {
+		for i := 0; i < c.Clients; i++ {
+			fmt.Println(reports[i])
+		}
+		fmt.Println("----------------- final report -------------------")
+		fmt.Println(finalReport)
 	}
-	fmt.Println("----------------- final report -------------------")
-	fmt.Println(finalReport)
 
 	t, err := template.ParseFiles("report_template.html")
 	if err != nil {
@@ -278,8 +277,9 @@ func main() {
 	}
 	f.Close()
 
-	// curl -X POST "https://YOUR_REGION-YOUR_PROJECT_ID.cloudfunctions.net/commander" -H "Content-Type:application/json"'
+	fmt.Println("\nCheck report.html in the root dir.")
 
+	// TODO - upload results to bucket
 	// report
 	// ctx := context.Background()
 	// client, err := storage.NewClient(ctx)

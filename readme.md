@@ -24,7 +24,7 @@ setup your config file
     credentials: "{path-to-my-credentials}.json" => Path to your google credentials
     concurrency: 1  => how many conccurent threads each CF uses 
     number: 10      => the number of requests each CF sends
-    url: https://localhost.com => url to attack
+    url: https://google.com => url to test
 
 Before you proceed, please check Google's pricing for Cloud Functions: https://cloud.google.com/functions/pricing#cloud-functions-pricing
 
