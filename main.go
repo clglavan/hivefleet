@@ -223,26 +223,26 @@ func main() {
 				// fmt.Println(bodyString)
 				json.Unmarshal([]byte(bodyString), &reports[i])
 
-				finalReport.BytesRead = (finalReport.BytesRead + reports[i].Result.BytesRead) / 2
-				finalReport.BytesWritten = (finalReport.BytesWritten + reports[i].Result.BytesWritten) / 2
-				finalReport.TimeTakenSeconds = math.Round(((finalReport.TimeTakenSeconds+reports[i].Result.TimeTakenSeconds)/2)*100) / 100
-				finalReport.Req1Xx = (finalReport.Req1Xx + reports[i].Result.Req1Xx) / 2
-				finalReport.Req2Xx = (finalReport.Req2Xx + reports[i].Result.Req2Xx) / 2
-				finalReport.Req3Xx = (finalReport.Req3Xx + reports[i].Result.Req3Xx) / 2
-				finalReport.Req4Xx = (finalReport.Req4Xx + reports[i].Result.Req4Xx) / 2
-				finalReport.Req5Xx = (finalReport.Req5Xx + reports[i].Result.Req5Xx) / 2
-				finalReport.Others = (finalReport.Others + reports[i].Result.Others) / 2
-				finalReport.Latency.Mean = math.Round(((finalReport.Latency.Mean+reports[i].Result.Latency.Mean)/2)*100) / 100
-				finalReport.Latency.Stddev = math.Round(((finalReport.Latency.Stddev+reports[i].Result.Latency.Stddev)/2)*100) / 100
-				finalReport.Latency.Max = math.Round(((finalReport.Latency.Max+reports[i].Result.Latency.Max)/2)*100) / 100
-				finalReport.Rps.Mean = math.Round(((finalReport.Rps.Mean+reports[i].Result.Rps.Mean)/2)*100) / 100
-				finalReport.Rps.Stddev = math.Round(((finalReport.Rps.Stddev+reports[i].Result.Rps.Stddev)/2)*100) / 100
-				finalReport.Rps.Max = math.Round(((finalReport.Rps.Max+reports[i].Result.Rps.Max)/2)*100) / 100
-				finalReport.Rps.Percentiles.Num50 = math.Round(((finalReport.Rps.Percentiles.Num50+reports[i].Result.Rps.Percentiles.Num50)/2)*100) / 100
-				finalReport.Rps.Percentiles.Num75 = math.Round(((finalReport.Rps.Percentiles.Num75+reports[i].Result.Rps.Percentiles.Num75)/2)*100) / 100
-				finalReport.Rps.Percentiles.Num90 = math.Round(((finalReport.Rps.Percentiles.Num90+reports[i].Result.Rps.Percentiles.Num90)/2)*100) / 100
-				finalReport.Rps.Percentiles.Num95 = math.Round(((finalReport.Rps.Percentiles.Num95+reports[i].Result.Rps.Percentiles.Num95)/2)*100) / 100
-				finalReport.Rps.Percentiles.Num99 = math.Round(((finalReport.Rps.Percentiles.Num99+reports[i].Result.Rps.Percentiles.Num99)/2)*100) / 100
+				finalReport.BytesRead += reports[i].Result.BytesRead
+				finalReport.BytesWritten += reports[i].Result.BytesWritten
+				finalReport.TimeTakenSeconds += reports[i].Result.TimeTakenSeconds
+				finalReport.Req1Xx += reports[i].Result.Req1Xx
+				finalReport.Req2Xx += reports[i].Result.Req2Xx
+				finalReport.Req3Xx += reports[i].Result.Req3Xx
+				finalReport.Req4Xx += reports[i].Result.Req4Xx
+				finalReport.Req5Xx += reports[i].Result.Req5Xx
+				finalReport.Others += reports[i].Result.Others
+				finalReport.Latency.Mean += reports[i].Result.Latency.Mean
+				finalReport.Latency.Stddev += reports[i].Result.Latency.Stddev
+				finalReport.Latency.Max += reports[i].Result.Latency.Max
+				finalReport.Rps.Mean += reports[i].Result.Rps.Mean
+				finalReport.Rps.Stddev += reports[i].Result.Rps.Stddev
+				finalReport.Rps.Max += reports[i].Result.Rps.Max
+				finalReport.Rps.Percentiles.Num50 += reports[i].Result.Rps.Percentiles.Num50
+				finalReport.Rps.Percentiles.Num75 += reports[i].Result.Rps.Percentiles.Num75
+				finalReport.Rps.Percentiles.Num90 += reports[i].Result.Rps.Percentiles.Num90
+				finalReport.Rps.Percentiles.Num95 += reports[i].Result.Rps.Percentiles.Num95
+				finalReport.Rps.Percentiles.Num99 += reports[i].Result.Rps.Percentiles.Num99
 			}
 			wg.Done()
 		}(i)
@@ -257,6 +257,19 @@ func main() {
 		fmt.Println("----------------- final report -------------------")
 		fmt.Println(finalReport)
 	}
+
+	finalReport.TimeTakenSeconds = math.Round((finalReport.TimeTakenSeconds)*100) / 100
+	finalReport.Latency.Mean = math.Round((finalReport.Latency.Mean/float64(c.Clients))*100) / 100
+	finalReport.Latency.Stddev = math.Round((finalReport.Latency.Stddev/float64(c.Clients))*100) / 100
+	finalReport.Latency.Max = math.Round((finalReport.Latency.Max/float64(c.Clients))*100) / 100
+	finalReport.Rps.Mean = math.Round((finalReport.Rps.Mean/float64(c.Clients))*100) / 100
+	finalReport.Rps.Stddev = math.Round((finalReport.Rps.Stddev/float64(c.Clients))*100) / 100
+	finalReport.Rps.Max = math.Round((finalReport.Rps.Max/float64(c.Clients))*100) / 100
+	finalReport.Rps.Percentiles.Num50 = math.Round((finalReport.Rps.Percentiles.Num50/float64(c.Clients))*100) / 100
+	finalReport.Rps.Percentiles.Num75 = math.Round((finalReport.Rps.Percentiles.Num75/float64(c.Clients))*100) / 100
+	finalReport.Rps.Percentiles.Num90 = math.Round((finalReport.Rps.Percentiles.Num90/float64(c.Clients))*100) / 100
+	finalReport.Rps.Percentiles.Num95 = math.Round((finalReport.Rps.Percentiles.Num95/float64(c.Clients))*100) / 100
+	finalReport.Rps.Percentiles.Num99 = math.Round((finalReport.Rps.Percentiles.Num99/float64(c.Clients))*100) / 100
 
 	t, err := template.ParseFiles("report_template.html")
 	if err != nil {
