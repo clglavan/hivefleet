@@ -1,4 +1,4 @@
-module hive-mind
+module github.com/clglavan/hive-fleet
 
 go 1.17
 

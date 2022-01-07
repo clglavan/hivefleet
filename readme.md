@@ -14,7 +14,7 @@ Prerequisites:
 - installed and configured gcloud where you run hive-fleet
 - asume that any run of this program could result in costs in GCP
 
-setup your config file 
+setup your config.yml file and pass it as a command line parameter
 
     clients: 5     => number of CF you want to start
     local: 0       => used for debugging, leave 0 when load-testing
