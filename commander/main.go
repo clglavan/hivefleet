@@ -3,24 +3,25 @@ package commander
 import (
 	"bytes"
 	// "context"
-	"fmt"
 	"math/rand"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
 	"time"
 	// "encoding/json"
+
 	// "cloud.google.com/go/storage"
 )
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ123456789")
 
 func randStr(n int) string {
-	b := make([]rune, n)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
-	}
-	return string(b)
+    b := make([]rune, n)
+    for i := range b {
+        b[i] = letters[rand.Intn(len(letters))]
+    }
+    return string(b)
 }
 
 func Commander(w http.ResponseWriter, r *http.Request) {
@@ -31,14 +32,14 @@ func Commander(w http.ResponseWriter, r *http.Request) {
 	// if(local != "1"){
 	// 	fmt.Println("Export the credentials to path")
 	// 	os.Setenv("GOOGLE_APPLICATION_CREDENTIALS", "./serverless_function_source_code/credentials.json")
-	// }
+	// }	
 	url := r.URL.Query().Get("url")
-	concurrency := r.URL.Query().Get("concurrency")
-	number := r.URL.Query().Get("number")
-
+	concurrency := r.URL.Query().Get("concurrency") 
+	number := r.URL.Query().Get("number")  
+	
 	bombardierPath := "./serverless_function_source_code/bombardier"
-	if local == "1" {
-		bombardierPath = "./../bombardier-mac"
+	if (local == "1") {
+		bombardierPath = "./../bombardier-mac" 
 	}
 	// fmt.Println("Error: ", url,concurrency,number)
 	bombardier := exec.Command(bombardierPath, "-c", concurrency, "-n", number, url, "-p", "r", "-o", "json")
@@ -52,7 +53,7 @@ func Commander(w http.ResponseWriter, r *http.Request) {
 
 	s := buf.String()
 
-	//Marshal or convert user object back to json and write to response
+	//Marshal or convert user object back to json and write to response 
 	// response, err := json.Marshal(s)
 	// if err != nil{
 	// 	panic(err)
@@ -61,9 +62,9 @@ func Commander(w http.ResponseWriter, r *http.Request) {
 	// json.NewEncoder(w).Encode(s)
 
 	//Set Content-Type header so that clients will know how to read response
-	w.Header().Set("Content-Type", "application/json")
+	w.Header().Set("Content-Type","application/json")
 	w.WriteHeader(http.StatusOK)
-	//Write json response back to response
+	//Write json response back to response 
 	w.Write([]byte(s))
 
 	// return s;
