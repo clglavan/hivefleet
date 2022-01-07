@@ -1,7 +1,7 @@
 clients: 5
 local: 0
 debug: 0
-deploy_function: 0
+deploy_function: 1
 function_memory: 256
 function_timeout: 120
 function_region: "us-central1"

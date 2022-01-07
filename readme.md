@@ -32,9 +32,9 @@ Before you proceed, please check Google's pricing for Cloud Functions: https://c
 
 Run the hive-mind with one of the two binaries
 
-    ./hive-mind-darwin-amd64
+    ./hive-mind-darwin-amd64 config.yml
     - or -
-    ./hive-mind-linux-amd64
+    ./hive-mind-linux-amd64 config.yml
 
 
 In the folder you will see a generated `report.html`
@@ -53,6 +53,6 @@ This will instruct hive-fleet to call a local endpoint insted of the cloud funct
 
 Run the hive-mind with one of the two binaries
 
-    ./hive-mind-darwin-amd64
+    ./hive-mind-darwin-amd64 config.yml
     - or -
-    ./hive-mind-linux-amd64
+    ./hive-mind-linux-amd64 config.yml

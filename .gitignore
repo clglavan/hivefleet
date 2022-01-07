@@ -1,2 +1,5 @@
 *.json
 report.html
+hive-mind-darwin-amd64
+hive-mind-linux-amd64
+bombardier-mac

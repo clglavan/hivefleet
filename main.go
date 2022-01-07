@@ -12,7 +12,7 @@ import (
 	"net/url"
 	"os"
 	"os/exec"
-	"path/filepath"
+	"path"
 	"strings"
 	"sync"
 	"time"
@@ -80,21 +80,27 @@ type conf struct {
 
 func (c *conf) getConf() *conf {
 
-	yamlFile, err := ioutil.ReadFile("config.yml")
+	if len(os.Args) < 2 {
+		fmt.Println("For the use of this program it is mandatory to have give the path to a config.yml file")
+		fmt.Println("Please consult https://github.com/clglavan/hive-fleet for an example")
+		os.Exit(1)
+	}
+	arg := os.Args[1]
+	fmt.Println(arg)
+
+	yamlFile, err := os.ReadFile(arg)
 	if err != nil {
-		log.Printf("yamlFile.Get err   #%v ", err)
+		fmt.Println("Error: ", err)
+		os.Exit(1)
 	}
 	err = yaml.Unmarshal(yamlFile, c)
 	if err != nil {
-		log.Fatalf("Unmarshal: %v", err)
+		fmt.Println("Unmarshal: ", err)
+		os.Exit(1)
 	}
 
 	return c
 }
-
-// func init() {
-
-// }
 
 func main() {
 	var c conf
@@ -113,6 +119,7 @@ func main() {
 		auth.Stderr = os.Stderr
 		if err := auth.Run(); err != nil {
 			fmt.Println("Error: ", err)
+			os.Exit(1)
 		}
 
 		// TODO - upload results to bucket
@@ -135,23 +142,52 @@ func main() {
 	}
 
 	// Getting the current working directory
-	currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
-	if err != nil {
-		log.Fatal(err)
-	}
+	// currentDir, err := filepath.Abs(filepath.Dir(os.Args[0]))
+	// if err != nil {
+	// 	log.Fatal(err)
+	// }
 
 	if c.Deploy_function == 1 && c.Local == 0 {
+
 		fmt.Println("Deploying the function is set to true")
+
+		e, err := os.Executable()
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+
+		// os.Exit(3)
+
+		clone := exec.Command("git", "clone", "https://github.com/clglavan/hive-fleet.git", "code")
+		clone.Dir = path.Dir(e)
+		clone.Stdout = os.Stdout
+		clone.Stderr = os.Stderr
+		fmt.Println("Clone the repository")
+		if err := clone.Run(); err != nil {
+			fmt.Println("Error: ", err)
+			os.Exit(1)
+		}
+
 		// Deploy
 		//"--allow-unauthenticated"
 		deploy := exec.Command("gcloud", "functions", "deploy", "Commander", "--runtime", "go116", "--trigger-http", "--memory="+c.Function_memory, "--timeout="+c.Function_timeout)
-		deploy.Dir = currentDir + "/commander"
+		deploy.Dir = path.Dir(e) + "/code/commander"
 		deploy.Stdout = os.Stdout
 		deploy.Stderr = os.Stderr
 		fmt.Println("Deploying function from " + deploy.Dir)
 		if err := deploy.Run(); err != nil {
 			fmt.Println("Error: ", err)
+			os.Exit(1)
 		}
+
+		fmt.Println("Cleanup directory")
+		clean := os.RemoveAll(path.Dir(e) + "/code")
+		if clean != nil {
+			fmt.Println(clean)
+			os.Exit(1)
+		}
+
 		// sleep a bit, wait for the function to update
 		time.Sleep(10 * time.Second)
 	}
@@ -163,6 +199,7 @@ func main() {
 	token.Stderr = os.Stderr
 	if err := token.Run(); err != nil {
 		fmt.Println("Error: ", err)
+		os.Exit(1)
 	}
 	tokenString := strings.TrimSpace(buf.String())
 
@@ -176,6 +213,7 @@ func main() {
 	projectId.Stderr = os.Stderr
 	if err := projectId.Run(); err != nil {
 		fmt.Println("Error: ", err)
+		os.Exit(1)
 	}
 	projectIdString := strings.TrimSpace(bufProjectId.String())
 	fmt.Printf("Project id: %s\n", projectIdString)
@@ -191,6 +229,7 @@ func main() {
 	req, err := http.NewRequest("GET", urlPath, nil)
 	if err != nil {
 		fmt.Println("Error: ", err)
+		os.Exit(1)
 	}
 
 	req.Header = http.Header{
