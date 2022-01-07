@@ -1,4 +1,4 @@
-# hive-fleet [![Go Report Card](https://goreportcard.com/badge/github.com/codesenberg/bombardier)](https://goreportcard.com/report/github.com/codesenberg/bombardier)
+# hive-fleet [![Go Report Card](https://goreportcard.com/badge/github.com/clglavan/hive-fleet)](https://goreportcard.com/report/github.com/clglavan/hive-fleet)
 
  `hive-fleet` is a distributed, scalable load-testing tool, built on top of https://github.com/codesenberg/bombardier (v1.2.5).
 
