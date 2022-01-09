@@ -77,14 +77,14 @@ type conf struct {
 	Debug            int
 }
 
-func (c *conf) getConf() *conf {
+func (c *conf) getConf(confPath string) *conf {
 
 	if len(os.Args) < 2 {
 		fmt.Println("For the use of this program it is mandatory to have give the path to a config.yml file")
 		fmt.Println("Please consult https://github.com/clglavan/hive-fleet for an example")
 		os.Exit(1)
 	}
-	arg := os.Args[1]
+	arg := confPath
 	fmt.Println(arg)
 
 	yamlFile, err := os.ReadFile(arg)
@@ -120,9 +120,9 @@ func exit() {
 	os.Exit(1)
 }
 
-func Run() {
+func Run(confPath string) {
 	var c conf
-	c.getConf()
+	c.getConf(confPath)
 
 	// fmt.Println(c.Deploy_function)
 
