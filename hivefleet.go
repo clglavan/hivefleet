@@ -79,11 +79,6 @@ type conf struct {
 
 func (c *conf) getConf(confPath string) *conf {
 
-	if len(os.Args) < 2 {
-		fmt.Println("For the use of this program it is mandatory to have give the path to a config.yml file")
-		fmt.Println("Please consult https://github.com/clglavan/hive-fleet for an example")
-		os.Exit(1)
-	}
 	arg := confPath
 	fmt.Println(arg)
 
