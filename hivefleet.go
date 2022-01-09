@@ -1,4 +1,4 @@
-package main
+package hivefleet
 
 import (
 	"bytes"
@@ -102,7 +102,26 @@ func (c *conf) getConf() *conf {
 	return c
 }
 
-func main() {
+func exit() {
+
+	// cleanup before exit with error
+
+	e, err := os.Executable()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	clean := os.RemoveAll(path.Dir(e) + "/code")
+	if clean != nil {
+		fmt.Println(clean)
+		os.Exit(1)
+	}
+
+	os.Exit(1)
+}
+
+func Run() {
 	var c conf
 	c.getConf()
 
@@ -166,7 +185,17 @@ func main() {
 		fmt.Println("Clone the repository")
 		if err := clone.Run(); err != nil {
 			fmt.Println("Error: ", err)
-			os.Exit(1)
+			exit()
+		}
+
+		copyReport := exec.Command("cp", "code/report_template.html", ".")
+		copyReport.Dir = path.Dir(e)
+		copyReport.Stdout = os.Stdout
+		copyReport.Stderr = os.Stderr
+		fmt.Println("Copy report file")
+		if err := copyReport.Run(); err != nil {
+			fmt.Println("Error: ", err)
+			exit()
 		}
 
 		// Deploy
@@ -178,7 +207,7 @@ func main() {
 		fmt.Println("Deploying function from " + deploy.Dir)
 		if err := deploy.Run(); err != nil {
 			fmt.Println("Error: ", err)
-			os.Exit(1)
+			exit()
 		}
 
 		fmt.Println("Cleanup directory")
@@ -199,7 +228,7 @@ func main() {
 	token.Stderr = os.Stderr
 	if err := token.Run(); err != nil {
 		fmt.Println("Error: ", err)
-		os.Exit(1)
+		exit()
 	}
 	tokenString := strings.TrimSpace(buf.String())
 
@@ -213,7 +242,7 @@ func main() {
 	projectId.Stderr = os.Stderr
 	if err := projectId.Run(); err != nil {
 		fmt.Println("Error: ", err)
-		os.Exit(1)
+		exit()
 	}
 	projectIdString := strings.TrimSpace(bufProjectId.String())
 	fmt.Printf("Project id: %s\n", projectIdString)
@@ -226,16 +255,6 @@ func main() {
 	}
 
 	client := http.Client{}
-	req, err := http.NewRequest("GET", urlPath, nil)
-	if err != nil {
-		fmt.Println("Error: ", err)
-		os.Exit(1)
-	}
-
-	req.Header = http.Header{
-		"Content-Type":  []string{"application/json"},
-		"Authorization": []string{"Bearer " + tokenString},
-	}
 
 	var wg sync.WaitGroup
 
@@ -248,6 +267,18 @@ func main() {
 
 		wg.Add(1)
 		go func(i int) {
+
+			req, err := http.NewRequest("GET", urlPath, nil)
+			if err != nil {
+				fmt.Println("Error: ", err)
+				exit()
+			}
+
+			req.Header = http.Header{
+				"Content-Type":  []string{"application/json"},
+				"Authorization": []string{"Bearer " + tokenString},
+			}
+
 			res, err := client.Do(req)
 			if err != nil {
 				fmt.Println("Error: ", err)
@@ -312,22 +343,35 @@ func main() {
 
 	t, err := template.ParseFiles("report_template.html")
 	if err != nil {
-		log.Print(err)
+		fmt.Println(err)
 		return
 	}
 
 	f, err := os.Create("report.html")
 	if err != nil {
-		log.Println("create file: ", err)
+		fmt.Println("create file: ", err)
 		return
 	}
 
 	err = t.Execute(f, finalReport)
 	if err != nil {
-		log.Print("execute: ", err)
+		fmt.Println("execute: ", err)
 		return
 	}
 	f.Close()
+
+	e, err := os.Executable()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	fmt.Println("\nCleanup report template")
+	cleanUpReport := os.RemoveAll(path.Dir(e) + "/report_template.html")
+	if cleanUpReport != nil {
+		fmt.Println(cleanUpReport)
+		os.Exit(1)
+	}
 
 	fmt.Println("\nCheck report.html in the root dir.")
 
