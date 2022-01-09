@@ -1,4 +1,4 @@
-module github.com/clglavan/hive-fleet
+module github.com/clglavan/hivefleet
 
 go 1.17
 
