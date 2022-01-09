@@ -6,7 +6,7 @@ It leverages the power of `Google Cloud Functions` to scale bombardier to any po
 
 # Take it for a spin
 
-    git clone https://github.com/clglavan/hivefleet.git
+Grab one of the [binaries](https://github.com/clglavan/hivefleet/releases)
 
 Prerequisites:
 - a billing enabled GCP project
@@ -41,7 +41,9 @@ In the folder you will see a generated `report.html`
 
 # Local setup
 
-If you want to test it out without involing GCP at all, you can first start a local webserver in 
+    git clone https://github.com/clglavan/hivefleet.git
+
+If you want to test it out without involing GCP at all, you can first start a local webserver (port 3000) in 
 
     ./commander/local/local
 
