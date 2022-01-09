@@ -1,7 +1,7 @@
 package main
 
 import (
-	hivefleet "github.com/clglavan/hive-fleet"
+	hivefleet "github.com/clglavan/hivefleet"
 )
 
 func main() {
