@@ -15,7 +15,6 @@ import (
 	"path"
 	"strings"
 	"sync"
-	"time"
 
 	"gopkg.in/yaml.v2"
 )
@@ -217,8 +216,8 @@ func Run() {
 			os.Exit(1)
 		}
 
-		// sleep a bit, wait for the function to update
-		time.Sleep(10 * time.Second)
+		// fmt.Println("If you are updating a function, take into consideration GCP takes some time to update to the new version")
+
 	}
 
 	// Get the authorization token
